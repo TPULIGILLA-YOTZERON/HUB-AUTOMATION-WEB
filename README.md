@@ -1,224 +1,172 @@
-# HUB Automation Web & ESP32 Controller Documentation
+# HUB-AUTOMATION-WEB
+
+[![License](https://img.shields.io/github/license/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB)](https://github.com/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB/issues)
+[![Forks](https://img.shields.io/github/forks/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB)](https://github.com/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB/network/members)
+[![Stars](https://img.shields.io/github/stars/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB)](https://github.com/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB/stargazers)
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+---
 
 ## Overview
 
-This documentation covers:
-- The main web application repository: **TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB**
-- Two ESP32 Arduino sketches:
-  - `ESP32_HTTP_Relay_Controller.ino` &mdash; For relay control using HTTP polling
-  - `ESP32_HTTP_RFID_Reader.ino` &mdash; For RFID-based access control using HTTP
+**HUB-AUTOMATION-WEB** is a comprehensive web automation platform designed to streamline and automate a variety of web-based tasks. This project aims to provide a robust, scalable, and user-friendly solution for automating repetitive or complex workflows through a web interface.
 
----
+## Features
 
-## 1. ESP32_HTTP_Relay_Controller.ino
+- User authentication and authorization
+- Intuitive dashboard and UI for managing automation tasks
+- Support for scheduling, monitoring, and logging automation jobs
+- RESTful API for integration with external systems
+- Modular architecture to add custom automation scripts/plugins
+- Real-time notifications and status updates
+- Role-based access control (RBAC)
+- Support for headless browser automation (e.g., Selenium, Puppeteer)
 
-### Purpose
+## Architecture
 
-Controls an 8-channel relay module using an ESP32 board. 
-- Periodically polls a server for relay commands.
-- Updates relays according to server instructions.
-- Optionally reads manual switches for local control and can report changes.
-- Sends periodic heartbeats to the server to indicate it is online.
+> _Describe the high-level architecture. Example below:_
 
-### Hardware Connections
+The platform follows a microservices-based architecture, with separate modules for the frontend (React/Vue/Angular), backend APIs (Node.js/Express, Django, etc.), and automation engine (Selenium, Puppeteer, etc.). Communication between services is handled via REST APIs and/or message queues.
 
-**Relays:**  
-| Relay (Device) | ESP32 GPIO |
-|----------------|------------|
-| Fan 1          | 13         |
-| Light 1        | 12         |
-| Fan 2          | 14         |
-| Light 2        | 27         |
-| Fan 3          | 26         |
-| Light 3        | 25         |
-| Fan 4          | 33         |
-| Light 4        | 32         |
+```
++-------------------+        +-------------------+        +-------------------+
+|    Web Frontend   | <----> |     Backend API   | <----> | Automation Engine |
++-------------------+        +-------------------+        +-------------------+
+         |                            |                            |
+         +----------------------------+----------------------------+
+                                 Database
+```
 
-**Manual Switches (Optional):**  
-Connect each switch between its GPIO and GND.
+## Getting Started
 
-| Switch (Function) | ESP32 GPIO |
-|-------------------|------------|
-| Switch 1 (Fan 1)  | 34         |
-| Switch 2 (Light 1)| 35         |
-| Switch 3 (Fan 2)  | 36         |
-| Switch 4 (Light 2)| 39         |
-| Switch 5 (Fan 3)  | 4          |
-| Switch 6 (Light 3)| 2          |
-| Switch 7 (Fan 4)  | 15         |
-| Switch 8 (Light 4)| 0          |
+### Prerequisites
 
-### Features
+- Node.js >= 18.x / Python >= 3.8 / Java >= 11 (select based on your stack)
+- npm / yarn / pip / Maven (as required)
+- Docker (optional, for containerized deployments)
+- [Any other dependencies]
 
-- Connects to a WiFi network
-- Polls a web server (Replit-based) for relay state commands every 5 seconds
-- Updates relay states (active LOW logic: LOW = ON, HIGH = OFF)
-- Reads manual switches and updates relays accordingly (with TODO for reporting to server)
-- Sends heartbeat messages to the server every 30 seconds with current relay states
+### Installation
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB.git
+cd HUB-AUTOMATION-WEB
+```
+
+#### 2. Install dependencies
+
+```bash
+# For Node.js
+npm install
+
+# For Python
+pip install -r requirements.txt
+
+# For Java
+mvn install
+```
+
+#### 3. Configure Environment
+
+Copy the example environment file and set your variables:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your database, API keys, and other secrets.
 
 ### Configuration
 
-In the source, update these lines:
+> _Describe major configuration options, such as database settings, API endpoints, environment variables, etc._
 
-```cpp
-const char* WIFI_SSID = "YOUR_WIFI_NAME";           // WiFi SSID
-const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";   // WiFi password
-const char* SERVER_URL = "https://your-replit-app.repl.co";  // Server endpoint
-const char* API_KEY = "AfTCwDOhwWqa7XegseVqS8Idaq5xyoIM";    // Provided API key
-const char* DEVICE_ID = "esp32_relay"; // Device identifier
+- `DATABASE_URL`: Database connection string
+- `SECRET_KEY`: Secret key for API/authentication
+- `AUTOMATION_ENGINE`: (selenium/puppeteer/other)
+- `PORT`: Default port
+
+## Usage
+
+### Running the Application
+
+```bash
+# Start the development server
+npm run dev
+# or
+python app.py
+# or
+docker-compose up
 ```
 
-### Dependencies
+Access the web UI at: `http://localhost:3000` (or your configured port).
 
-- ArduinoJson
-- WiFi.h
-- HTTPClient.h
+### Example: Creating an Automation Task
 
-### Main Functions
+> _Provide step-by-step instructions or screenshots._
 
-- **setup()**: Initializes serial, relays, switches, and connects to WiFi.
-- **loop()**: Handles polling, heartbeat, WiFi reconnection, and switch detection.
-- **pollServerForCommands()**: GETs `/api/esp32/commands?deviceId=...` and updates relays.
-- **setRelay(index, state)**: Sets relay state with correct logic.
-- **checkManualSwitches()**: Reads switches, updates relays, (TODO: report to server).
-- **sendHeartbeat()**: POSTs to `/api/esp32/commands` with current relay status.
+1. Login to the dashboard.
+2. Navigate to "Tasks" and click "Create New Task".
+3. Fill out the automation script/settings.
+4. Save and run the task.
 
----
+## API Reference
 
-## 2. ESP32_HTTP_RFID_Reader.ino
+> _Include details or link to API documentation if available._
 
-### Purpose
+- `POST /api/tasks` - Create a new automation task
+- `GET /api/tasks` - List all tasks
+- `GET /api/tasks/:id` - Get task details
+- `PUT /api/tasks/:id` - Update task
+- `DELETE /api/tasks/:id` - Delete task
 
-Reads RFID cards using an RC522 module and an ESP32 board.
-- When a card is scanned, sends the UID to the server over HTTP.
-- Server determines access rights and can trigger relays.
+## Testing
 
-### Hardware Connections (RC522 to ESP32)
-
-| RC522 Pin | ESP32 GPIO |
-|-----------|------------|
-| SDA (SS)  | 5          |
-| SCK       | 18         |
-| MOSI      | 23         |
-| MISO      | 19         |
-| GND       | GND        |
-| RST       | 22         |
-| 3.3V      | 3.3V       |
-
-**LED Feedback:**  
-- GPIO 2 (onboard LED on most ESP32 boards) flashes for status.
-
-### Features
-
-- Connects to WiFi
-- Waits for RFID cards
-- Sends UID to server via HTTP POST (`/api/rfid-scan`)
-- Displays access granted/denied based on server reply (via LED and serial)
-- Implements cooldown to avoid duplicate readings from the same card
-
-### Configuration
-
-In the source, update these lines:
-
-```cpp
-const char* WIFI_SSID = "YOUR_WIFI_NAME";           // WiFi SSID
-const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";   // WiFi password
-const char* SERVER_URL = "https://your-replit-app.repl.co";  // Server endpoint
-const char* API_KEY = "AfTCwDOhwWqa7XegseVqS8Idaq5xyoIM";    // Provided API key
+```bash
+npm test
+# or
+pytest
 ```
 
-### Dependencies
+> _Mention code coverage, CI/CD integrations, etc._
 
-- MFRC522
-- ArduinoJson
-- WiFi.h
-- HTTPClient.h
-- SPI.h
+## Contributing
 
-### Main Functions
+Contributions are welcome! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-- **setup()**: Initializes serial, SPI, RC522, LED, and connects to WiFi.
-- **loop()**: Waits for new RFID card, debounces, and sends UID to server.
-- **sendRFIDToServer(uid)**: POSTs UID and deviceId to `/api/rfid-scan`. Handles response.
-- **blinkLED(times, delayMs)**: Flashes LED for user feedback.
+1. Fork this repository
+2. Create your feature branch (`git checkout -b feat/YourFeature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feat/YourFeature`)
+5. Open a Pull Request
 
----
+## License
 
-## 3. HUB-AUTOMATION-WEB Repository
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-### General Description
+## Contact
 
-This is the main web backend (and possibly frontend) for the home automation system interacting with the ESP32 devices.  
-It provides HTTP API endpoints for:
-- Relay command polling and reporting (for the relay controller)
-- Receiving RFID scans and making access decisions (for the RFID reader)
-- Storing and managing device states and user access
+For questions, issues, or feature requests, please open an issue or contact the maintainer.
 
-### API Endpoints (as referenced by ESP32 code)
-
-#### `/api/esp32/commands?deviceId=esp32_relay` (GET)
-- Returns a JSON array of relay device commands.
-
-#### `/api/esp32/commands` (POST)
-- Receives device heartbeat and relay states.
-
-#### `/api/rfid-scan` (POST)
-- Receives RFID UID, responds with access grant/deny.
-
-### Technologies
-
-- Likely Node.js, Express, or Replit server
-- Uses an API key for authentication (`x-api-key` header)
-- Stores user/device states (details in repo source)
-
-### How It Works
-
-- ESP32 devices communicate via HTTP (not MQTT)
-- Centralized server controls relay state and access
-- API key protects endpoints
-- Easy to integrate with other services or UIs
+- GitHub: [TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB](https://github.com/TPULIGILLA-YOTZERON/HUB-AUTOMATION-WEB)
+- Email: [your-email@example.com]
 
 ---
 
-## General Setup Guide
-
-1. **Configure and flash** the ESP32 sketches with your WiFi and server details.
-2. **Wire hardware** according to the pin tables above.
-3. **Run the web server** (see HUB-AUTOMATION-WEB repo for instructions).
-4. **Test**:
-   - For relays: Observe relays toggling in response to web dashboard/API changes.
-   - For RFID: Scan cards and check server response/LED feedback.
-
----
-
-## Security Reminders
-
-- Change all default credentials and API keys before deploying.
-- Use HTTPS for server connections to secure data.
-- Restrict API access using API keys and/or IP whitelisting.
-
----
-
-## Resources
-
-- [ArduinoJson library](https://arduinojson.org/)
-- [MFRC522 library](https://github.com/miguelbalboa/rfid)
-- [ESP32 Documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/)
-
----
-
-## Troubleshooting
-
-- **WiFi not connecting**: Double-check SSID/password, ensure 2.4GHz network.
-- **Relays not responding**: Check wiring, power supply, relay logic levels.
-- **RFID not reading**: Check wiring, use 3.3V for RC522, ensure connections are firm.
-- **Server errors**: Check API key, server logs, endpoint URLs.
-
----
-
-## Contributors
-
-- [TPULIGILLA-YOTZERON](https://github.com/TPULIGILLA-YOTZERON)
-- [Your Name Here]
-
----
+> _Replace placeholders with actual information from your project as needed._
